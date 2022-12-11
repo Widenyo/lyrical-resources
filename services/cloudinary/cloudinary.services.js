@@ -11,35 +11,56 @@ class CloudinaryService {
     });
   }
 
-  async getFolders(folder = '') {
+  async getFolders(folder = '/') {
     // Fetch a list of all folders in the specified folder
     const subFolders = await cloudinary.api.sub_folders(folder);
-
     // Initialize an empty object to store the results
     const folders = {};
 
     // Loop through each subfolder and fetch its files and subfolders
     for (const subFolder of subFolders.folders) {
-      folders[subFolder] = {
+      const {name, path} = subFolder
+      if(!name) return folders
+      folders[name] = {
         files: [],
-        folders: []
       };
 
-      // Fetch the files in the current subfolder
-      const files = await cloudinary.api.resources({
-        type: 'upload',
-        prefix: `${folder}/${subFolder}/`
-      });
+      let files = []
+      // Fetch the files in the current folder
+
+      // cloudinary.search.expression(`folder=${path}`).execute().then(r =>{
+      //     files = [...files, ...r]
+      // }).catch(e => console.error(e))
+      // console.log(files)
+
+
+        let promise = new Promise((resolve, reject) => {
+          cloudinary.search
+            .expression(`folder=${path}`)
+            .execute()
+            .then((result) => { resolve(result) })
+            .catch((error) => {
+              console.error(error)
+            });
+        })
+      
+        let result = await promise
+        files = result.resources
+
+        if(path === 'accepted/test' || path === 'accepted/test2' || path === 'accepted/test3') console.log(files)
+
 
       // Loop through each file and add it to the results object
-      for (const file of files.resources) {
-        folders[subFolder].files.push({
-          fileData: file
+      for (const file of files) {
+        folders[name].files.push({
+          ...file
         });
       }
 
       // Recursively call this function to fetch the subfolders of the current subfolder
-      folders[subFolder].folders = await this.getFolders(`${folder}/${subFolder}`);
+      Object.assign(folders[name], 
+        await this.getFolders(path)
+        )
     }
 
     return folders;
@@ -47,6 +68,4 @@ class CloudinaryService {
 }
 
 module.exports = CloudinaryService;
-
-const test = new CloudinaryService()
 
