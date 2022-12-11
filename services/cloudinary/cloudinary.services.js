@@ -25,29 +25,29 @@ class CloudinaryService {
         files: [],
       };
 
+
       let files = []
-      // Fetch the files in the current folder
 
-      // cloudinary.search.expression(`folder=${path}`).execute().then(r =>{
-      //     files = [...files, ...r]
-      // }).catch(e => console.error(e))
-      // console.log(files)
+      try{
+      let filesReq = await cloudinary.search.expression(`folder=${path}`).sort_by('public_id','desc').max_results(500).execute()
+      let resources = filesReq.resources
+      files = resources
 
+      if(filesReq.next_cursor){
+        let flag = true
+        let pointer = filesReq.next_cursor
+        while(flag){
+          const filesReq = await cloudinary.v2.search.expression(`folder=${path}`).sort_by('public_id','desc').max_results(500).next_cursor(pointer).execute()
+          files = [...files, ...filesReq.resources]
+          pointer = filesReq.next_cursor
+          if(!pointer) flag = false
+      }
+      }
+    }catch(e){
+      console.error(e.message)
+    }
 
-        let promise = new Promise((resolve, reject) => {
-          cloudinary.search
-            .expression(`folder=${path}`)
-            .execute()
-            .then((result) => { resolve(result) })
-            .catch((error) => {
-              console.error(error)
-            });
-        })
-      
-        let result = await promise
-        files = result.resources
-
-        if(path === 'accepted/test' || path === 'accepted/test2' || path === 'accepted/test3') console.log(files)
+       console.log(files.length)
 
 
       // Loop through each file and add it to the results object
