@@ -13,7 +13,7 @@ server.listen(port, async () => {
         if(!data.success){
             console.log(data.message, 'Creating JSON file.')
             const cloudinaryFiles = await cloudinaryService.getFolders()
-            jsonFileService.writeJson(cloudinaryFiles)
+            await jsonFileService.writeJson(cloudinaryFiles)
         }
         data = null
         console.log('Cloudinary files loaded successfully')
@@ -21,7 +21,7 @@ server.listen(port, async () => {
         setInterval(async () => {
             try{
             const cloudinaryFiles = await cloudinaryService.getFolders()
-            jsonFileService.updateJson(cloudinaryFiles)
+            await jsonFileService.updateJson(cloudinaryFiles)
             }catch(e){
                 console.error(e, 'cancelling update')
             }
