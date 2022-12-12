@@ -1,28 +1,30 @@
-const {Router} = require('express')
+const { Router } = require("express");
 const router = Router();
 
-router.get('/*', async (req, res) => {
+const JsonFileService = require("../../services/json/json.services");
+const jsonFileService = new JsonFileService("cloudinary");
 
-    try{
-        const {originalUrl} = req
-        console.log(originalUrl)
-        const splitUrl = originalUrl.split('/')
-        splitUrl.shift()
-        console.log(splitUrl)
-        let folder = req.app.locals.cloudinary
-        splitUrl.forEach(i =>{
-            if(!folder[i]) return
-            folder = folder[i]
-        })
-        res.json({success: true,
-            data:folder.files})
-    }catch(e){
-        res.json({
-            success: false,
-            error: e.message
-        })
-    };
+router.get("/*", async (req, res) => {
+  try {
+    const { originalUrl } = req;
+    const splitUrl = originalUrl.split("/");
+    splitUrl.shift();
 
+    let folder = await (await jsonFileService.readJson()).data;
+
+    splitUrl.forEach((i) => {
+      if (!folder[i]) return;
+      folder = folder[i];
+    });
+
+    res.json({ success: true, data: folder });
+  } catch (e) {
+    console.error(e);
+    res.json({
+      success: false,
+      error: e.message,
+    });
+  }
 });
 
 module.exports = router;
