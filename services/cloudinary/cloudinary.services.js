@@ -11,6 +11,23 @@ class CloudinaryService {
     });
   }
 
+  async uploadFile(url, public_id){
+    try{
+    const upload = await cloudinary.uploader.upload(url, {
+      public_id
+    })
+    return {
+      success: true,
+      upload
+    }
+  }catch(e){
+    return {
+      success: false,
+      message: e.message
+    }
+    }
+  }
+
   async getFolders(folder = '/') {
     // Fetch a list of all folders in the specified folder
     const subFolders = await cloudinary.api.sub_folders(folder);
@@ -69,3 +86,6 @@ class CloudinaryService {
 
 module.exports = CloudinaryService;
 
+
+// const test = new CloudinaryService()
+// test.uploadFile('https://drive.google.com/uc?export=view&id=1VqtPBl9wS4535r9wclvzGIG55GnT3h27', 'sex/sunflower.jpg')
