@@ -1,3 +1,5 @@
 .env
 node_modules
 services/json/storage/*
+services/drive/token.json
+services/drive/credentials.json
