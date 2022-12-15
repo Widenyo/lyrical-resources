@@ -48,6 +48,7 @@ class DriveService {
     const cloudinaryFiles = await (await cloudinaryStorage.readJson()).data;
     const folders = await (
       await drive.files.list({
+        pageSize: 1000,
         q: `mimeType = 'application/vnd.google-apps.folder' and '1V01dUq6WNiQ9XvTQ3Unh4R4mLvAdRsRK' in parents`,
       })
     ).data.files;
@@ -57,6 +58,7 @@ class DriveService {
 
       const files = await (
         await drive.files.list({
+          pageSize: 1000,
           q: `'${id}' in parents`,
         })
       ).data.files;
@@ -65,8 +67,15 @@ class DriveService {
       //If folder doesnt exists, upload all files in a new folder
       if (!cloudinaryFiles[name]) {
         for (const file of files) {
+          const base64img = await (await drive.files.get({
+            fileId: file.id,
+            alt: 'media'
+          }, {
+            responseType: 'arraybuffer'
+          })).data
+          const base64String = `data:${file.mimeType};base64,` + Buffer.from(base64img, 'binary').toString('base64');
           console.log('Uploading ' + file.name + ' on ' + `${name}/${file.name}`)
-          const upload = await cloudinaryService.uploadFile(`https://drive.google.com/uc?export=view&id=${file.id}`, `${name}/${file.name}`)
+          const upload = await cloudinaryService.uploadFile(base64String, `${name}/${file.name}`)
           if(!upload.success){
             console.log('Failed to upload ' + file.name)
           }
@@ -84,8 +93,15 @@ class DriveService {
           }
         }
         if(!exists){
+          const base64img = await (await drive.files.get({
+            fileId: file.id,
+            alt: 'media'
+          }, {
+            responseType: 'arraybuffer'
+          })).data
+          const base64String = `data:${file.mimeType};base64,` + Buffer.from(base64img, 'binary').toString('base64');
           console.log('Uploading ' + file.name + ' on ' + `${name}/${file.name}`)
-          const upload = await cloudinaryService.uploadFile(`https://drive.google.com/uc?export=view&id=${file.id}`, `${name}/${file.name}`)
+          const upload = await cloudinaryService.uploadFile(base64String, `${name}/${file.name}`)
           if(!upload.success){
             console.log('Failed to upload ' + file.name)
           }

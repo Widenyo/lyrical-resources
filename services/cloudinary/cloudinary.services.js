@@ -21,6 +21,7 @@ class CloudinaryService {
       upload
     }
   }catch(e){
+    console.error(e)
     return {
       success: false,
       message: e.message
