@@ -47,7 +47,7 @@ class CloudinaryService {
       let files = []
 
       try{
-      let filesReq = await cloudinary.search.expression(`folder=${path}`).sort_by('public_id','desc').max_results(500).execute()
+      let filesReq = await cloudinary.search.expression(`folder=${path}`).with_field('tags').with_field('context').sort_by('public_id','desc').max_results(500).execute()
       let resources = filesReq.resources
       files = resources
 
@@ -55,7 +55,7 @@ class CloudinaryService {
         let flag = true
         let pointer = filesReq.next_cursor
         while(flag){
-          const filesReq = await cloudinary.v2.search.expression(`folder=${path}`).sort_by('public_id','desc').max_results(500).next_cursor(pointer).execute()
+          const filesReq = await cloudinary.v2.search.expression(`folder=${path}`).with_field('tags').with_field('context').sort_by('public_id','desc').max_results(500).next_cursor(pointer).execute()
           files = [...files, ...filesReq.resources]
           pointer = filesReq.next_cursor
           if(!pointer) flag = false
