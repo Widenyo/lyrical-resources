@@ -108,6 +108,23 @@ class DriveService {
         }
       }
 
+      for (const cloudFile of cloudinaryFiles[name].files) {
+        let exists = false
+        for(const file of files){
+          if (cloudFile.filename === file.name){
+            exists = true
+            break
+          }
+        }
+          if(!exists){
+            const deleted = await cloudinaryService.deleteFile(`${name}/${file.name}`)
+            console.log('deleting ' + file.name)
+            if(!deleted.success){
+              console.log('Failed to delete ' + file.name)
+            }
+          }
+      }
+
     }
 
 

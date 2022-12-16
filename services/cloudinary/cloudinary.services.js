@@ -29,6 +29,22 @@ class CloudinaryService {
     }
   }
 
+  async deleteFile(path){
+    try{
+      const deleted = await cloudinary.uploader.destroy(path)
+      return {
+        success: true,
+        deleted
+      }
+    }catch(e){
+      console.error(e)
+      return {
+        success: false,
+        message: e.message
+      }
+    }
+  }
+
   async getFolders(folder = '/') {
     // Fetch a list of all folders in the specified folder
     const subFolders = await cloudinary.api.sub_folders(folder);
