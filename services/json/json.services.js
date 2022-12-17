@@ -23,7 +23,7 @@ class JsonFileService {
     }
   
     async updateJson(data) {
-      const currentData = await this.readJson();
+      const currentData = await (await this.readJson()).data;
       const updatedData = { ...currentData, ...data };
       await this.writeJson(updatedData);
     }
